@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fano Host Basic Policy</title>
+<title>Fano Policies</title>
 <style>
 :root{
   /* Replaceable image variables: swap the data URIs for file paths such as url("img/fano.png") */
@@ -108,6 +108,9 @@ footer .fh{width:96px;aspect-ratio:780/585;margin:0 auto 8px;background:var(--im
 footer strong{display:block;font-size:1.5rem}
 footer em{font-size:1.2rem;color:var(--lavender);letter-spacing:.04em}
 
+.agency{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin-top:20px}
+.agency .ring{flex:none;width:clamp(110px,30vw,150px)}
+.agency .pane{margin:0;flex:1 1 260px}
 @media (max-width:560px){
   .line{flex-direction:column;align-items:flex-start;gap:4px}
   .flow{grid-template-columns:1fr}.flow span.op{justify-self:center}
@@ -121,13 +124,13 @@ footer em{font-size:1.2rem;color:var(--lavender);letter-spacing:.04em}
 <main>
   <header class="hero wrap">
     <div class="stage"><div class="lockup" role="img" aria-label="Fano logo with the purple-and-white bird mascot"></div></div>
-    <h1>Fano Host Basic Policy</h1>
-    <p class="sub">See how Gift Share, Host Share and Room Bonus add up to your diamonds.</p>
+    <h1>Fano Policies</h1>
+    <p class="sub">Host and Agency policies at a glance, plus a calculator for your host diamonds.</p>
   </header>
 
   <section class="wrap" aria-labelledby="pol">
     <div class="panel">
-      <h2 id="pol">Host policy</h2>
+      <h2 id="pol">Host Policy</h2>
       <div class="tabs" role="tablist" aria-label="Policy types">
         <button class="tab" role="tab" id="t0" aria-controls="p0" aria-selected="true"  data-target="100"><div class="ring"><span>0%</span></div><b>Gift Share</b></button>
         <button class="tab" role="tab" id="t1" aria-controls="p1" aria-selected="false" tabindex="-1" data-target="200"><div class="ring"><span>0%</span></div><b>Host Share</b></button>
@@ -179,6 +182,18 @@ footer em{font-size:1.2rem;color:var(--lavender);letter-spacing:.04em}
       </div>
       <p class="how-note">Add the three together for your total diamonds, then divide by 1,500,000 to see the USD amount.</p>
       <div class="rate"><span class="l">Salary Withdrawal Rate</span><span class="v">1,500,000 Diamonds = $1 USD</span></div>
+    </div>
+  </section>
+  <section class="wrap" aria-labelledby="agy">
+    <div class="panel">
+      <h2 id="agy">Agency Policy</h2>
+      <div class="agency">
+        <div class="ring" role="img" aria-label="Agency Commission 50 percent" data-target="50" data-max="100"><span>0%</span></div>
+        <div class="pane">
+          <h3>Agency Commission</h3>
+          <p>Agency Commission is 50% of ID Target.</p>
+        </div>
+      </div>
     </div>
   </section>
 </main>
@@ -250,6 +265,20 @@ tabs.forEach((t,i)=>{
 });
 select(0);
 tabs.forEach((_,i)=>{ if(i) count(i); });
+
+/* ---- Agency Commission counter: counts 0 -> 50% when it scrolls into view, then holds ---- */
+const agRing = document.querySelector('.agency .ring');
+function countAgency(){
+  const label = agRing.querySelector('span'), target = +agRing.dataset.target, max = +agRing.dataset.max;
+  tween(1500, e => {
+    const v = Math.min(target, Math.round(target * e));
+    label.textContent = v + '%';
+    agRing.style.setProperty('--p', Math.min(100, v / max * 100));   // ring scale is 0-100%
+  });
+}
+if('IntersectionObserver' in window){
+  new IntersectionObserver((es,o)=>{ if(es[0].isIntersecting){ countAgency(); o.disconnect(); } },{threshold:.4}).observe(agRing);
+} else countAgency();
 
 /* ---- Salary calculator ---- */
 const input = document.getElementById('dia'), err = document.getElementById('err');
